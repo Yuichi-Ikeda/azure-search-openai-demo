@@ -42,7 +42,7 @@ class ReadRetrieveReadApproach(AskApproach):
 "\n\nYou can access to the following tools:"
 
     template_prefix_jp = \
-"あなたは日本の歴史に関する質問をサポートする教師アシスタントです。" \
+"あなたは厚生労働省の就業規則に関する質問をサポートする教師アシスタントです。" \
 "以下の情報源に記載されているデータのみを用いて、質問に答えてください。" \
 "表形式の情報については、htmlテーブルとして返してください。マークダウン形式で返さないでください。" \
 "各ソースには、名前の後にコロンと実際のデータがあり、レスポンスで使用する各データのソース名を引用します。" \
@@ -126,7 +126,7 @@ Thought: {agent_scratchpad}"""
             Tool(name="CognitiveSearch",
                 func=retrieve_and_store,
                 coroutine=retrieve_and_store,
-                description="日本の歴史の人物情報の検索に便利です。ユーザーの質問から検索クエリーを生成して検索します。"
+                description="ユーザーの質問から検索クエリーを生成して検索します。"
                 ),
             CafeSearchTool()
         ]

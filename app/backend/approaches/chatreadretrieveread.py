@@ -24,7 +24,7 @@ class ChatReadRetrieveReadApproach(ChatApproach):
     検索からトップ文書を抽出し、それを使ってプロンプトを構成し、OpenAIで補完生成する (answer)をそのプロンプトで表示します。
     """
     system_message_chat_conversation = """
-Answer the reading comprehension question on the history of the Kamakura period in Japan.
+Answer the reading comprehension question on the Labor regulations document of the Ministry of Health, Labour and Welfare in Japan.
 If you cannot guess the answer to a question from the SOURCES, answer "I don't know".
 Answers must be in Japanese.
 
@@ -38,8 +38,8 @@ Answers must be in Japanese.
     follow_up_questions_prompt_content = """
 Answers must be accompanied by three additional follow-up questions to the user's question. The rules for follow-up questions are defined in the Restrictions.
 
-- Please answer only questions related to the history of the Kamakura period in Japan. If the question is not related to the history of the Kamakura period in Japan, answer "I don't know".
-- Use double angle brackets to reference the questions, e.g. <<What did Minamotono Yoritomo do? >>.
+- Please answer only questions related to the Labor regulations document of the Ministry of Health, Labour and Welfare in Japan. If the question is not related to the Labor regulations document of the Ministry of Health, Labour and Welfare in Japan, answer "I don't know".
+- Use double angle brackets to reference the questions, e.g. <<Can I do a side job? >>.
 - Try not to repeat questions that have already been asked.
 - Do not add SOURCES to follow-up questions.
 - Do not use bulleted follow-up questions. Always enclose them in double angle brackets.
@@ -47,27 +47,27 @@ Answers must be accompanied by three additional follow-up questions to the user'
 - Only generate questions and do not generate any text before or after the questions, such as 'Next Questions'
 
 EXAMPLE:###
-Q:徳川家康はどのような人物ですか？
-A:徳川家康は、日本の戦国時代から江戸時代初期にかけての武将、大名、政治家であり、江戸幕府を開いた人物です。彼は義を重んじ、家来のことを大切にした人物とされています。また、負けず嫌いで血気盛んだったが、臆病だが冷静に対処できる性格だったとされています。 [徳川家康 - Wikipedia-2.pdf.txt][徳川家康 - Wikipedia-13.pdf][徳川家康-2.txt]<<徳川家康はどのような功績を残しましたか？>><<徳川家康はどのように江戸幕府を開いたのですか？>><<他にも有名な武将や大名はいますか？>>
+Q:試用期間について教えてください？
+A:試用期間を設ける場合にその期間の長さに関する定めは労基法上ありません、ただし、労働者の地位を不安定にすることから、あまりに長い期間を試用期間とすることは好ましくありません。[info1.txt][info2.pdf] 試用期間中の解雇については、最初の１４日間以内であれば即時に解雇することができます。[info3.pdf] １４日を超えて雇用した後に解雇する場合には、原則として３０日以上前に予告をしなければなりません。[info4.pdf]<<試用期間中の給与についての規則はありますか？>><<試用期間中の解雇理由はどのようになっていますか？>><<他にも試用期間に関する注意点はありますか？>>
 
-Q:関ケ原の戦いはどのような戦いですか？
-A:関ヶ原の戦いは、1600年10月21日に美濃国不破郡関ヶ原（岐阜県不破郡関ケ原町）で行われた野戦です。関ヶ原における決戦を中心に日本の全国各地で戦闘が行われ、関ヶ原の合戦・関ヶ原合戦とも呼ばれます。合戦当時は南北朝時代の古戦場・「青野原」や「青野カ原」と書かれた文献もある。主戦場となった関ヶ原古戦場跡は国指定の史跡となっています。豊臣秀吉が死んだ後の権力をめぐって石田三成が率いる西軍と、徳川家康が率いる東軍が戦いました。[徳川家康 - Wikipedia-2.pdf][石田三成 - Wikipedia-11.pdf]<<戦いの結果はどうなったのですか？>><<徳川家康と石田三成について教えてください>><<他にも有名な合戦がありますか？>>
+Q:副業は出来ますか？
+A:労働者は、勤務時間外において、他の会社等の業務に従事することができます。[info1.txt] ただし、これは副業・兼業に関するモデル規定であり、就業規則の内容は事業場の実態に合ったものとしなければなりません。[info2.pdf] 副業・兼業に係る相談、自己申告等を行ったことにより不利益な取扱いをすることはできません。また、労働時間の管理や労働条件の変更についても適切な措置を講じる必要があります。[info3.pdf]<<一般的な制限事項はありますか？>><<労働時間の管理はどのようになりますか？>><<他にも副業における注意点はありますか？>>
 ###
 
 """
 
     query_prompt_template = """
-Below is a history of previous conversations and a new question from a user that needs to be answered by searching the Knowledge Base on Japanese history.
+Below is a history of previous conversations and a new question from a user that needs to be answered by searching the Knowledge Base on Japanese Labor regulations document.
 Based on the conversation and the new question, create a search query.
 Do not include the name of the cited file or document (e.g., info.txt or doc.pdf) in the search query.
 Do not include text in [] or <>> in the search query.
 If you cannot generate a search query, return only the number 0.
 """
     query_prompt_few_shots = [
-        {'role' : USER, 'content' : '徳川家康ってなにした人  ' },
-        {'role' : ASSISTANT, 'content' : '徳川家康 人物 歴史' },
-        {'role' : USER, 'content' : '徳川家康の武功を教えてください' },
-        {'role' : ASSISTANT, 'content' : '徳川家康 人物 武功 業績' }
+        {'role' : USER, 'content' : '試用期間中の解雇について教えてください  ' },
+        {'role' : ASSISTANT, 'content' : '試用期間 解雇 条件' },
+        {'role' : USER, 'content' : '副業の時間的制約はありますか' },
+        {'role' : ASSISTANT, 'content' : '副業 時間 制約' }
     ]
 
     def __init__(self, search_client: SearchClient, chatgpt_deployment: str, chatgpt_model: str, embedding_deployment: str, sourcepage_field: str, content_field: str):
